@@ -78,7 +78,7 @@ dependencies {
 
     testImplementation("org.clojure:clojure:1.10.0")
     testImplementation("joda-time:joda-time:2.8.2")
-    testImplementation("org.slf4j:slf4j-simple:1.7.10")
+    testImplementation("org.slf4j:slf4j-simple:2.0.12")
     testImplementation("org.codehaus.groovy:groovy-all:2.5.12")
     testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
     testRuntimeOnly("cglib:cglib-nodep:3.1")
