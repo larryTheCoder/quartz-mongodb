@@ -1,20 +1,15 @@
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
     }
 }
 
 plugins {
     id 'net.researchgate.release' version '2.8.1'
-    id "com.jfrog.bintray" version "1.8.5"
     id 'com.sourcemuse.mongo' version '1.0.7'
 }
 
 allprojects {
-	repositories {
-		jcenter()
-	}
 	apply plugin: 'maven-publish'
 	apply plugin: 'java'
 }
@@ -35,8 +30,8 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 configurations {
@@ -94,14 +89,15 @@ release {
     versionPropertyFile = 'gradle.properties'
 }
 
-task sourceJar(type: Jar) {
-    dependsOn classes
-    classifier "sources"
+task sourceJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
+    jar.reproducibleFileOrder = true
+    jar.preserveFileTimestamps = false
 }
 
 task javadocJar(type: Jar) {
-    classifier 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc
 }
 
@@ -117,12 +113,12 @@ artifacts {
 publishing {
     publications {
         quartzMongoDB(MavenPublication) {
-            groupId    = 'com.novemberain'
+            groupId    = 'com.mongo-quartz'
             artifactId = archivesBaseName
             version    = projectVersion
 
             artifact sourceJar {
-                classifier "sources"
+                archiveClassifier = "sources"
             }
 
             from components.java
@@ -154,25 +150,5 @@ tasks.withType(Test){
         port 27017
         logging 'console'
         mongoVersion 'PRODUCTION'
-    }
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USERNAME")
-    key  = System.getenv("BINTRAY_API_KEY")
-    publications = ['quartzMongoDB']
-    pkg {
-        repo = 'maven'
-        name = 'quartz-mongodb'
-        labels = ['quartz', 'mongodb']
-        userOrg = 'michaelklishin'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/michaelklishin/quartz-mongodb.git'
-
-        version {
-            name = projectVersion
-            desc = 'MongoDB-backed job store for the Quartz scheduler'
-			vcsTag = projectVersion
-        }
     }
 }
