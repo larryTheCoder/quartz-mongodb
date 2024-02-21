@@ -83,6 +83,9 @@ dependencies {
 release {
     scmAdapters = [net.researchgate.release.GitAdapter]
     versionPropertyFile = 'gradle.properties'
+    git {
+      requireBranch.set('master')
+    }
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
