@@ -82,10 +82,6 @@ dependencies {
 
 release {
     scmAdapters = [net.researchgate.release.GitAdapter]
-    git {
-        pushToRemote = 'origin'
-    }
-
     versionPropertyFile = 'gradle.properties'
 }
 
