@@ -7,22 +7,16 @@ buildscript {
 plugins {
     id 'net.researchgate.release' version '3.0.2'
     id 'com.sourcemuse.mongo' version '1.0.7'
+    id 'maven-publish'
+    id 'java'
+    id 'idea'
+    id 'eclipse'
 }
-
-allprojects {
-	apply plugin: 'maven-publish'
-	apply plugin: 'java'
-}
-
-apply plugin: 'eclipse'
-apply plugin: 'groovy'
-apply plugin: 'idea'
-apply plugin: 'com.sourcemuse.mongo'
 
 archivesBaseName = 'quartz-mongodb'
 
 jar {
-    archiveVersion = projectVersion
+    archiveVersion = version
 }
 
 repositories {
@@ -112,15 +106,25 @@ artifacts {
 publishing {
     publications {
         quartzMongoDB(MavenPublication) {
-            groupId    = 'com.mongo-quartz'
+            groupId    = 'io.github.avi-sanwal'
             artifactId = archivesBaseName
-            version    = projectVersion
+            version    = version
 
             artifact sourceJar {
                 archiveClassifier = "sources"
             }
 
             from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
         }
     }
 }
