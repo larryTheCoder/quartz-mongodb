@@ -8,7 +8,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' || github.actor == vars.RELEASE_ACTOR_NAME
     steps:
       - name: Dependabot metadata
         id: metadata
