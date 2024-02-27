@@ -22,7 +22,7 @@ jobs:
             VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
             echo "VERSION=$VER" >> $GITHUB_ENV
 
-      - name: Publish package
+      - name: Update release in gradle.properties
         run: |
             git checkout -B "release-${{ env.VERSION }}"
             git config user.email ${{ vars.RELEASE_ACTOR_NAME }}@users.noreply.github.com

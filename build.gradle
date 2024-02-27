@@ -78,7 +78,7 @@ release {
     scmAdapters = [net.researchgate.release.GitAdapter]
     versionPropertyFile = 'gradle.properties'
     git {
-      requireBranch.set('/release-\\d+.\\d+.\\d+/')
+      requireBranch.set(/release-\d+.\d+.\d+/)
     }
 }
 
