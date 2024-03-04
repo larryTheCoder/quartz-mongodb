@@ -71,7 +71,7 @@ dependencies {
     testImplementation("org.codehaus.groovy:groovy-all:3.0.20")
     testImplementation("org.spockframework:spock-core:2.3-groovy-4.0")
     testRuntimeOnly("cglib:cglib-nodep:3.3.0")
-    testRuntimeOnly("org.objenesis:objenesis:2.1")
+    testRuntimeOnly("org.objenesis:objenesis:3.3")
 }
 
 release {
