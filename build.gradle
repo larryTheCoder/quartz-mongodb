@@ -61,7 +61,7 @@ dependencies {
     implementation("commons-codec:commons-codec:1.16.1")
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
-    implementation("org.slf4j:slf4j-api:1.7.21")
+    implementation("org.slf4j:slf4j-api:2.0.12")
 
     compileOnly("org.clojure:clojure:1.11.1")
 
