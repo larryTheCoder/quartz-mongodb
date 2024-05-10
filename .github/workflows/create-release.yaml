@@ -7,22 +7,38 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != vars.RELEASE_ACTOR_NAME
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: getLatestRelease
+        name: Get latest release
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repo: ${{ github.repository }}
+
+      - id: countOfCommits
+        name: Count of commits
+        run: git rev-list --count ${{ steps.getLatestRelease.outputs.tag }}...${{ github.head_ref }} >> "$GITHUB_OUTPUT"
+
       - name: Set up Java
+        if: steps.countOfCommits.outputs.stdout > 5
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
 
       - name: Setup Gradle
+        if: steps.countOfCommits.outputs.stdout > 5
         uses: gradle/actions/setup-gradle@v3
 
       - name: Get next release version
+        if: steps.countOfCommits.outputs.stdout > 5
         run: |
             VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
             echo "VERSION=$VER" >> $GITHUB_ENV
 
       - name: Update release in gradle.properties
+        if: steps.countOfCommits.outputs.stdout > 5
         run: |
             git checkout -B "release-${{ env.VERSION }}"
             git config user.email ${{ vars.RELEASE_ACTOR_NAME }}@users.noreply.github.com
@@ -30,6 +46,7 @@ jobs:
             ./gradlew release -Prelease.useAutomaticVersion=true
 
       - name: Create pull request
+        if: steps.countOfCommits.outputs.stdout > 5
         uses: repo-sync/pull-request@v2.12.1
         id: create-pr
         with:
@@ -38,15 +55,27 @@ jobs:
             pr_title: "Create new release: ${{ env.VERSION }}"
             pr_body: "Create release ${{ env.VERSION }} automatically."
 
-      - name: Create GitHub release
-        uses: actions/create-release@v1.1.4
-        id: create-release
+      - name: Publish package
+        if: steps.countOfCommits.outputs.stdout > 5
+        run: ./gradlew publish
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+
+      - name: Create GitHub release
+        if: steps.countOfCommits.outputs.stdout > 5
+        uses: softprops/action-gh-release@v1
+        id: create-release
         with:
+            token: ${{ secrets.GITHUB_TOKEN }}
             tag_name: ${{ env.VERSION }}
-            release_name: quartz-mongodb v${{ env.VERSION }}
+            name: quartz-mongodb v${{ env.VERSION }}
             draft: false
             body: |
                 Usage:
                     `implementation("io.github.avi-sanwal:quartz-mongodb:${{ env.VERSION }}")`
+            generate_release_notes: true
+            files: |
+                build/libs/quartz-mongodb-${{ env.VERSION }}.jar
+                build/libs/quartz-mongodb-${{ env.VERSION }}-sources.jar
+                build/libs/quartz-mongodb-${{ env.VERSION }}-javadoc.jar
