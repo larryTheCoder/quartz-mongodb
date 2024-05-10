@@ -10,15 +10,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - id: getLatestRelease
-        name: Get latest release
-        uses: pozetroninc/github-action-get-latest-release@master
-        with:
-          repo: ${{ github.repository }}
+      - id: getCurrentReleaseVersion
+        name: Get current release version
+        run: |
+            VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
+            echo "VERSION=$VER" >> $GITHUB_OUTPUT
 
       - id: countOfCommits
         name: Count of commits
-        run: git rev-list --count ${{ steps.getLatestRelease.outputs.tag }}...${{ github.head_ref }} >> "$GITHUB_OUTPUT"
+        run: |
+            git rev-list --count ${{ steps.getCurrentReleaseVersion.outputs.stdout }}...${{ github.head_ref }} >> "$GITHUB_OUTPUT"
 
       - name: Set up Java
         if: steps.countOfCommits.outputs.stdout > 5
@@ -31,19 +32,20 @@ jobs:
         if: steps.countOfCommits.outputs.stdout > 5
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Get next release version
-        if: steps.countOfCommits.outputs.stdout > 5
-        run: |
-            VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-            echo "VERSION=$VER" >> $GITHUB_ENV
-
       - name: Update release in gradle.properties
         if: steps.countOfCommits.outputs.stdout > 5
         run: |
-            git checkout -B "release-${{ env.VERSION }}"
+            git checkout -B "release-${{ steps.getCurrentReleaseVersion.outputs.stdout }}"
             git config user.email ${{ vars.RELEASE_ACTOR_NAME }}@users.noreply.github.com
             git config user.name ${{ vars.RELEASE_ACTOR_NAME }}
             ./gradlew release -Prelease.useAutomaticVersion=true
+
+      - id: getNewReleaseVersion
+        if: steps.countOfCommits.outputs.stdout > 5
+        name: Get updated release version
+        run: |
+            VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
+            echo "VERSION=$VER" >> $GITHUB_OUTPUT
 
       - name: Create pull request
         if: steps.countOfCommits.outputs.stdout > 5
@@ -51,9 +53,9 @@ jobs:
         id: create-pr
         with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
-            source_branch: "release-${{ env.VERSION }}"
-            pr_title: "Create new release: ${{ env.VERSION }}"
-            pr_body: "Create release ${{ env.VERSION }} automatically."
+            source_branch: "release-${{ steps.getNewReleaseVersion.outputs.stdout }}"
+            pr_title: "Create new release: ${{ steps.getNewReleaseVersion.outputs.stdout }}"
+            pr_body: "Create release ${{ steps.getNewReleaseVersion.outputs.stdout }} automatically."
 
       - name: Publish package
         if: steps.countOfCommits.outputs.stdout > 5
@@ -68,14 +70,14 @@ jobs:
         id: create-release
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
-            tag_name: ${{ env.VERSION }}
-            name: quartz-mongodb v${{ env.VERSION }}
+            tag_name: ${{ steps.getNewReleaseVersion.outputs.stdout }}
+            name: quartz-mongodb v${{ steps.getNewReleaseVersion.outputs.stdout }}
             draft: false
             body: |
                 Usage:
-                    `implementation("io.github.avi-sanwal:quartz-mongodb:${{ env.VERSION }}")`
+                    `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.getNewReleaseVersion.outputs.stdout }}")`
             generate_release_notes: true
             files: |
-                build/libs/quartz-mongodb-${{ env.VERSION }}.jar
-                build/libs/quartz-mongodb-${{ env.VERSION }}-sources.jar
-                build/libs/quartz-mongodb-${{ env.VERSION }}-javadoc.jar
+                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.stdout }}.jar
+                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.stdout }}-sources.jar
+                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.stdout }}-javadoc.jar
