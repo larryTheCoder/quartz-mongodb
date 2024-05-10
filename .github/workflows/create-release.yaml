@@ -19,7 +19,9 @@ jobs:
       - id: countOfCommits
         name: Count of commits
         run: |
-            COUNT=$(git rev-list --count ${{ steps.getCurrentReleaseVersion.outputs.VERSION }}...HEAD)
+            HEAD_REV=$(git rev-parse HEAD)
+            CURRENT_RELEASE_REV=$(git rev-parse ${{ steps.getCurrentReleaseVersion.outputs.VERSION }})
+            COUNT=$(git rev-list --count ${CURRENT_RELEASE_REV}...${HEAD_REV})
             echo "COUNT_OF_COMMITS=${COUNT}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Set up Java
