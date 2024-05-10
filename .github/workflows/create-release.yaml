@@ -13,17 +13,17 @@ jobs:
           fetch-tags: true
           fetch-depth: 0
 
-      - id: getCurrentReleaseVersion
-        name: Get current release version
+      - id: getNewReleaseVersion
+        name: Get updated release version
         run: |
             VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-            echo "VERSION=$VER" | tee -a "$GITHUB_OUTPUT"
+            echo "VERSION=$VER" | tee -a $GITHUB_OUTPUT
 
       - id: countOfCommits
         name: Count of commits
         run: |
             HEAD_REV=$(git rev-parse HEAD)
-            CURRENT_RELEASE_REV=$(git rev-parse ${{ steps.getCurrentReleaseVersion.outputs.VERSION }})
+            CURRENT_RELEASE_REV=$(git log -n 1 --format=%H gradle.properties)
             COUNT=$(git rev-list --count ${CURRENT_RELEASE_REV}...${HEAD_REV})
             echo "COUNT_OF_COMMITS=${COUNT}" | tee -a "$GITHUB_OUTPUT"
 
@@ -41,17 +41,10 @@ jobs:
       - name: Update release in gradle.properties
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         run: |
-            git checkout -B "release-${{ steps.getCurrentReleaseVersion.outputs.VERSION }}"
+            git checkout -B "release-${{ steps.getNewReleaseVersion.outputs.VERSION }}"
             git config user.email ${{ vars.RELEASE_ACTOR_NAME }}@users.noreply.github.com
             git config user.name ${{ vars.RELEASE_ACTOR_NAME }}
             ./gradlew release -Prelease.useAutomaticVersion=true
-
-      - id: getNewReleaseVersion
-        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
-        name: Get updated release version
-        run: |
-            VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-            echo "VERSION=$VER" | tee -a $GITHUB_OUTPUT
 
       - name: Create pull request
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
