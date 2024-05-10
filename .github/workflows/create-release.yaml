@@ -19,65 +19,66 @@ jobs:
       - id: countOfCommits
         name: Count of commits
         run: |
-            git rev-list --count ${{ steps.getCurrentReleaseVersion.outputs.stdout }}...${{ github.head_ref }} | tee -a "$GITHUB_OUTPUT"
+            COUNT=$(git rev-list --count ${{ steps.getCurrentReleaseVersion.outputs.VERSION }}...HEAD)
+            echo "COUNT_OF_COMMITS=${COUNT}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Set up Java
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         uses: gradle/actions/setup-gradle@v3
 
       - name: Update release in gradle.properties
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         run: |
-            git checkout -B "release-${{ steps.getCurrentReleaseVersion.outputs.stdout }}"
+            git checkout -B "release-${{ steps.getCurrentReleaseVersion.outputs.VERSION }}"
             git config user.email ${{ vars.RELEASE_ACTOR_NAME }}@users.noreply.github.com
             git config user.name ${{ vars.RELEASE_ACTOR_NAME }}
             ./gradlew release -Prelease.useAutomaticVersion=true
 
       - id: getNewReleaseVersion
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         name: Get updated release version
         run: |
             VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-            echo "VERSION=$VER" >> $GITHUB_OUTPUT
+            echo "VERSION=$VER" | tee -a $GITHUB_OUTPUT
 
       - name: Create pull request
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         uses: repo-sync/pull-request@v2.12.1
         id: create-pr
         with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
-            source_branch: "release-${{ steps.getNewReleaseVersion.outputs.stdout }}"
-            pr_title: "Create new release: ${{ steps.getNewReleaseVersion.outputs.stdout }}"
-            pr_body: "Create release ${{ steps.getNewReleaseVersion.outputs.stdout }} automatically."
+            source_branch: "release-${{ steps.getNewReleaseVersion.outputs.VERSION }}"
+            pr_title: "Create new release: ${{ steps.getNewReleaseVersion.outputs.VERSION }}"
+            pr_body: "Create release ${{ steps.getNewReleaseVersion.outputs.VERSION }} automatically."
 
       - name: Publish package
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         run: ./gradlew publish
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
 
       - name: Create GitHub release
-        if: steps.countOfCommits.outputs.stdout > 5
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         uses: softprops/action-gh-release@v1
         id: create-release
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
-            tag_name: ${{ steps.getNewReleaseVersion.outputs.stdout }}
-            name: quartz-mongodb v${{ steps.getNewReleaseVersion.outputs.stdout }}
+            tag_name: ${{ steps.getNewReleaseVersion.outputs.VERSION }}
+            name: quartz-mongodb v${{ steps.getNewReleaseVersion.outputs.VERSION }}
             draft: false
             body: |
                 Usage:
-                    `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.getNewReleaseVersion.outputs.stdout }}")`
+                    `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.getNewReleaseVersion.outputs.VERSION }}")`
             generate_release_notes: true
             files: |
-                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.stdout }}.jar
-                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.stdout }}-sources.jar
-                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.stdout }}-javadoc.jar
+                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}.jar
+                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}-sources.jar
+                build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}-javadoc.jar
