@@ -12,18 +12,13 @@ jobs:
         with:
           fetch-tags: true
           fetch-depth: 0
-
-      - id: getNewReleaseVersion
-        name: Get updated release version
-        run: |
-            VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-            echo "VERSION=$VER" | tee -a $GITHUB_OUTPUT
+          clean: true
 
       - id: countOfCommits
         name: Count of commits
         run: |
             HEAD_REV=$(git rev-parse HEAD)
-            CURRENT_RELEASE_REV=$(git log -n 1 --format=%H gradle.properties)
+            CURRENT_RELEASE_REV=$(git log -n 1 --format=%H -- gradle.properties)
             COUNT=$(git rev-list --count ${CURRENT_RELEASE_REV}...${HEAD_REV})
             echo "COUNT_OF_COMMITS=${COUNT}" | tee -a "$GITHUB_OUTPUT"
 
@@ -37,6 +32,13 @@ jobs:
       - name: Setup Gradle
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         uses: gradle/actions/setup-gradle@v3
+
+      - id: getNewReleaseVersion
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
+        name: Get updated release version
+        run: |
+            VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
+            echo "VERSION=$VER" | tee -a $GITHUB_OUTPUT
 
       - name: Update release in gradle.properties
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
