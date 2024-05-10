@@ -14,12 +14,12 @@ jobs:
         name: Get current release version
         run: |
             VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-            echo "VERSION=$VER" >> $GITHUB_OUTPUT
+            echo "VERSION=$VER" | tee -a "$GITHUB_OUTPUT"
 
       - id: countOfCommits
         name: Count of commits
         run: |
-            git rev-list --count ${{ steps.getCurrentReleaseVersion.outputs.stdout }}...${{ github.head_ref }} >> "$GITHUB_OUTPUT"
+            git rev-list --count ${{ steps.getCurrentReleaseVersion.outputs.stdout }}...${{ github.head_ref }} | tee -a "$GITHUB_OUTPUT"
 
       - name: Set up Java
         if: steps.countOfCommits.outputs.stdout > 5
