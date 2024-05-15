@@ -5,7 +5,6 @@ plugins {
     id 'java'
     id 'idea'
     id 'eclipse'
-    id 'signing'
 }
 
 group = 'io.github.avi-sanwal'
@@ -97,13 +96,6 @@ tasks.withType(Javadoc) {
 artifacts {
     archives sourceJar
     archives javadocJar
-}
-
-signing {
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign configurations.archives
 }
 
 publishing {
