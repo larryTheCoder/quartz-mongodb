@@ -2,6 +2,10 @@ name: Create new release
 on:
     push:
       branches: [ "master" ]
+
+permissions:
+  contents: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -62,8 +66,8 @@ jobs:
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         run: ./gradlew publish
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub release
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5

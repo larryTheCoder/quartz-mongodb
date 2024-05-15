@@ -6,7 +6,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  auto-merge:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' || github.actor == vars.RELEASE_ACTOR_NAME
     steps:
