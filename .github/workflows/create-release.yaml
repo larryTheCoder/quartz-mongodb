@@ -67,6 +67,7 @@ jobs:
           pr_body: "Create release ${{ steps.getNewReleaseVersion.outputs.VERSION }} automatically."
 
       - name: Auto-merge release PR
+        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         run: gh pr merge --admin --merge "$PR_URL"
         env:
           PR_URL: ${{ steps.create-pr.outputs.pr_url }}
@@ -82,8 +83,16 @@ jobs:
           name: quartz-mongodb v${{ steps.getNewReleaseVersion.outputs.VERSION }}
           draft: false
           body: |
-            Usage:
-                `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.getNewReleaseVersion.outputs.VERSION }}")`
+            Maven Usage:
+              ```
+              <dependency>
+                <groupId>io.github.avi-sanwal</groupId>
+                <artifactId>quartz-mongodb</artifactId>
+                <version>${{ steps.getNewReleaseVersion.outputs.VERSION }}</version>
+              </dependency>
+              ```
+            Gradle Usage:
+              `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.getNewReleaseVersion.outputs.VERSION }}")`
           generate_release_notes: true
           files: |
             build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}.jar
