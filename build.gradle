@@ -63,7 +63,7 @@ dependencies {
     testImplementation("org.clojure:clojure:1.11.3")
     testImplementation("joda-time:joda-time:2.12.7")
     testImplementation("org.slf4j:slf4j-simple:2.0.13")
-    testImplementation("org.codehaus.groovy:groovy-all:3.0.21")
+    testImplementation("org.codehaus.groovy:groovy-all:3.0.22")
     testImplementation("org.spockframework:spock-core:2.3-groovy-4.0")
     testRuntimeOnly("cglib:cglib-nodep:3.3.0")
     testRuntimeOnly("org.objenesis:objenesis:3.4")
