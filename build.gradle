@@ -58,9 +58,9 @@ dependencies {
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
     implementation("org.slf4j:slf4j-api:2.0.16")
 
-    compileOnly("org.clojure:clojure:1.11.4")
+    compileOnly("org.clojure:clojure:1.12.0")
 
-    testImplementation("org.clojure:clojure:1.11.4")
+    testImplementation("org.clojure:clojure:1.12.0")
     testImplementation("joda-time:joda-time:2.12.7")
     testImplementation("org.slf4j:slf4j-simple:2.0.16")
     testImplementation("org.codehaus.groovy:groovy-all:3.0.22")
