@@ -1,12 +1,13 @@
 name: Create new release
 on:
-  push:
-    branches: ["master"]
+  pull_request:
+    types:
+      - closed
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.actor != vars.RELEASE_ACTOR_NAME
+    if: github.actor != vars.RELEASE_ACTOR_NAME && github.event.pull_request.merged == true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
