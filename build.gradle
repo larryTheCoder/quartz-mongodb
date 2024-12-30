@@ -1,5 +1,5 @@
 plugins {
-    id 'net.researchgate.release' version '3.0.2'
+    id 'net.researchgate.release' version '3.1.0'
     id 'com.sourcemuse.mongo' version '2.0.0'
     id 'maven-publish'
     id 'java'
