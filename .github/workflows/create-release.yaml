@@ -1,22 +1,11 @@
 name: Create new release
 on:
-  pull_request:
-    types:
-      - closed
+  schedule:
+    - cron: "* * * * 1"
 
 jobs:
-  print:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print GitHub actor
-        run: echo "github.actor=${{github.actor}}, vars.RELEASE_ACTOR_NAME=${{vars.RELEASE_ACTOR_NAME}}"
-    
-      - name: Print GitHub pull_request
-        run: echo "github.event.pull_request.merged=${{github.event.pull_request.merged}}"
-
   publish:
     runs-on: ubuntu-latest
-    if: github.actor != vars.RELEASE_ACTOR_NAME && github.event.pull_request.merged
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,11 +14,18 @@ jobs:
           fetch-depth: 0
           clean: true
 
+      - id: latestRelease
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ github.repository }}
+          excludes: prerelease, draft
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - id: countOfCommits
         name: Count of commits
         run: |
           HEAD_REV=$(git rev-parse HEAD)
-          CURRENT_RELEASE_REV=$(git log -n 1 --format=%H -- gradle.properties)
+          CURRENT_RELEASE_REV=$(git rev-parse '${{ steps.latestRelease.outputs.release }}^{commit}')
           COUNT=$(git rev-list --count ${CURRENT_RELEASE_REV}...${HEAD_REV})
           echo "COUNT_OF_COMMITS=${COUNT}" | tee -a "$GITHUB_OUTPUT"
 
@@ -51,37 +47,20 @@ jobs:
           GH_USERNAME: ${{ github.actor }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - id: getNewReleaseVersion
+      - name: Get Next Version
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
-        name: Get updated release version
-        run: |
-          VER=$(awk -F '=' ' /^version/ { print $2 } ' gradle.properties)
-          echo "VERSION=$VER" | tee -a $GITHUB_OUTPUT
+        id: nextSemver
+        uses: ietf-tools/semver-action@v1
+        with:
+          token: ${{ github.token }}
+          branch: master
+          patchList: Bump ,fix, bugfix, perf, refactor, test, tests
+          fallbackTag: ${{ steps.latestRelease.outputs.release }}
 
       - name: Update release in gradle.properties
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
         run: |
-          git checkout -B "release-${{ steps.getNewReleaseVersion.outputs.VERSION }}"
-          git config user.email ${{ vars.RELEASE_ACTOR_NAME }}@users.noreply.github.com
-          git config user.name ${{ vars.RELEASE_ACTOR_NAME }}
-          ./gradlew release -Prelease.useAutomaticVersion=true
-
-      - name: Create pull request
-        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
-        uses: repo-sync/pull-request@v2.12.1
-        id: create-pr
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: "release-${{ steps.getNewReleaseVersion.outputs.VERSION }}"
-          pr_title: "Create new release: ${{ steps.getNewReleaseVersion.outputs.VERSION }}"
-          pr_body: "Create release ${{ steps.getNewReleaseVersion.outputs.VERSION }} automatically."
-
-      - name: Auto-merge release PR
-        if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
-        run: gh pr merge --admin --merge "$PR_URL"
-        env:
-          PR_URL: ${{ steps.create-pr.outputs.pr_url }}
-          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          sed -i "s/^version.*/version=${{ steps.nextSemver.outputs.nextStrict }}/g" gradle.properties
 
       - name: Create GitHub release
         if: steps.countOfCommits.outputs.COUNT_OF_COMMITS > 5
@@ -89,8 +68,8 @@ jobs:
         id: create-release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ steps.getNewReleaseVersion.outputs.VERSION }}
-          name: quartz-mongodb v${{ steps.getNewReleaseVersion.outputs.VERSION }}
+          tag_name: ${{ steps.nextSemver.outputs.nextStrict }}
+          name: quartz-mongodb ${{ steps.nextSemver.outputs.next }}
           draft: false
           body: |
             Maven Usage:
@@ -98,13 +77,13 @@ jobs:
               <dependency>
                 <groupId>io.github.avi-sanwal</groupId>
                 <artifactId>quartz-mongodb</artifactId>
-                <version>${{ steps.getNewReleaseVersion.outputs.VERSION }}</version>
+                <version>${{ steps.nextSemver.outputs.nextStrict }}</version>
               </dependency>
               ```
             Gradle Usage:
-              `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.getNewReleaseVersion.outputs.VERSION }}")`
+              `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.nextSemver.outputs.nextStrict }}")`
           generate_release_notes: true
           files: |
-            build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}.jar
-            build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}-sources.jar
-            build/libs/quartz-mongodb-${{ steps.getNewReleaseVersion.outputs.VERSION }}-javadoc.jar
+            build/libs/quartz-mongodb-${{ steps.nextSemver.outputs.nextStrict }}.jar
+            build/libs/quartz-mongodb-${{ steps.nextSemver.outputs.nextStrict }}-sources.jar
+            build/libs/quartz-mongodb-${{ steps.nextSemver.outputs.nextStrict }}-javadoc.jar
