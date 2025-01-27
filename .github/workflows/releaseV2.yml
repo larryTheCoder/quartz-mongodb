@@ -29,12 +29,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Publish package
-        run: ./gradlew publish
-        env:
-          GH_USERNAME: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Get Next Version
         id: nextSemver
         uses: ietf-tools/semver-action@v1
@@ -47,6 +41,12 @@ jobs:
       - name: Update release in gradle.properties
         run: |
           sed -i "s/^version.*/version=${{ steps.nextSemver.outputs.nextStrict }}/g" gradle.properties
+
+      - name: Publish package
+        run: ./gradlew publish
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
