@@ -1,7 +1,7 @@
 name: Create new release
 on:
   schedule:
-    - cron: "* * * * 1"
+    - cron: "*/5 * * * 1"
 
 jobs:
   publish:
