@@ -46,7 +46,7 @@ public class JobCompleteHandler {
             }
         }
 
-        if (job.isConcurrentExectionDisallowed()) {
+        if (job.isConcurrentExecutionDisallowed()) {
             locksDao.unlockJob(job);
         }
 
