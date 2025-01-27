@@ -5,9 +5,18 @@ on:
       - closed
 
 jobs:
+  print:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print GitHub actor
+        run: echo "github.actor=${{github.actor}}, vars.RELEASE_ACTOR_NAME=${{vars.RELEASE_ACTOR_NAME}}"
+    
+      - name: Print GitHub pull_request
+        run: echo "github.event.pull_request.merged=${{github.event.pull_request.merged}}"
+
   publish:
     runs-on: ubuntu-latest
-    if: github.actor != vars.RELEASE_ACTOR_NAME && github.event.pull_request.merged == true
+    if: github.actor != vars.RELEASE_ACTOR_NAME && github.event.pull_request.merged
     steps:
       - name: Checkout
         uses: actions/checkout@v4
