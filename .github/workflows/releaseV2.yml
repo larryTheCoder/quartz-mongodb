@@ -53,7 +53,7 @@ jobs:
         with:
           token: ${{ github.token }}
           branch: master
-          patchList: build(deps), fix, bugfix, perf, refactor, test, tests
+          patchList: build, fix, bugfix, perf, refactor, test, tests
           fallbackTag: ${{ steps.latestRelease.outputs.release }}
 
       - name: Update release in gradle.properties
