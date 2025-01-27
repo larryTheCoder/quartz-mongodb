@@ -28,7 +28,7 @@ public class LockManager {
      * @param job    job to lock
      */
     public void lockJob(JobDetail job) {
-        if (job.isConcurrentExectionDisallowed()) {
+        if (job.isConcurrentExecutionDisallowed()) {
             locksDao.lockJob(job);
         }
     }
