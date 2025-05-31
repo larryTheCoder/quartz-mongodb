@@ -10,13 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' || github.actor == vars.RELEASE_ACTOR_NAME
     steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --merge "$PR_URL"
+      - id: Enable auto-merge for Dependabot PRs
+        name: automerge
+        uses: "pascalgn/automerge-action@v0.16.4"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
