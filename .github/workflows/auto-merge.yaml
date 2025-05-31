@@ -8,11 +8,13 @@ permissions:
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == vars.RELEASE_ACTOR_NAME
     steps:
       - id: automerge
         name: Enable auto-merge for Dependabot PRs
         uses: "pascalgn/automerge-action@v0.16.4"
         env:
-          GITHUB_TOKEN: "${{ secrets.DEPENDABOT_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MERGE_LABELS: dependencies
+          MERGE_RETRIES: 36
+          MERGE_RETRY_SLEEP: 10000
+          
