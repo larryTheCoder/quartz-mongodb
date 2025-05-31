@@ -14,5 +14,5 @@ jobs:
         name: Enable auto-merge for Dependabot PRs
         uses: "pascalgn/automerge-action@v0.16.4"
         env:
-          GITHUB_TOKEN: "${{ secrets.DEPENDABOT_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.patForDependabot }}"
           MERGE_LABELS: dependencies
