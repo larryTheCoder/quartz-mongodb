@@ -1,6 +1,9 @@
 name: Create new release v2
-on: [push, workflow_dispatch]
-
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 */3 *"
+    
 jobs:
   publish:
     runs-on: ubuntu-latest
