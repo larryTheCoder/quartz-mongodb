@@ -7,8 +7,8 @@ on your own and produce your own releases. Issues that ask others to do somethin
 will be ignored. Pull requests may be merged on a very random schedule.
 
 **Update**: This is a fork with dependabot setup. Dependabot keeps updating the dependencies in this project. However, apart from unit tests added originally by the author, no other tests would be performed. The project is still to be considered as abandoned.
-See [master...avi-sanwal:quartz-mongodb:master](https://github.com/michaelklishin/quartz-mongodb/compare/master...avi-sanwal:quartz-mongodb:master) for diff.
-Automation has been setup to build and publish the JARs here: [https://github.com/avi-sanwal/quartz-mongodb/packages/](https://github.com/avi-sanwal/quartz-mongodb/packages/2150140)
+See [master...larrythecoder:quartz-mongodb:master](https://github.com/michaelklishin/quartz-mongodb/compare/master...larrythecoder:quartz-mongodb:master) for diff.
+Automation has been setup to build and publish the JARs here: [https://github.com/larrythecoder/quartz-mongodb/packages/](https://github.com/larrythecoder/quartz-mongodb/packages/2150140)
 
 ## What is This?
 

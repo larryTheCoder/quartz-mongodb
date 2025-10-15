@@ -117,12 +117,12 @@ publishing {
                 name = 'Mongo QuartzDB Scheduler'
                 packaging = 'jar'
                 description = 'Forked and updated version of https://github.com/michaelklishin/quartz-mongodb.'
-                url = 'https://github.com/avi-sanwal/quartz-mongodb'
+                url = 'https://github.com/larrythecoder/quartz-mongodb'
 
                 scm {
-                    connection='scm:git:git:github.com/avi-sanwal/quartz-mongodb/'
-                    developerConnection='scm:git:git:github.com/avi-sanwal/quartz-mongodb/'
-                    url='https://github.com/avi-sanwal/quartz-mongodb/'
+                    connection='scm:git:git:github.com/larrythecoder/quartz-mongodb/'
+                    developerConnection='scm:git:git:github.com/larrythecoder/quartz-mongodb/'
+                    url='https://github.com/larrythecoder/quartz-mongodb/'
                 }
 
                 licenses {
@@ -138,7 +138,7 @@ publishing {
     repositories {
         maven {
             name = "Clojars"
-            url = uri("https://repo.clojars.org/")
+            url = uri("https://repo.clojars.org/repo")
             credentials {
                 username = project.findProperty("clojars.user") ?: System.getenv("CLOJARS_USERNAME")
                 password = project.findProperty("clojars.password") ?: System.getenv("CLOJARS_PASSWORD")
