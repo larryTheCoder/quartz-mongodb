@@ -7,7 +7,7 @@ plugins {
     id 'eclipse'
 }
 
-group = 'io.github.avi-sanwal'
+group = 'io.github.larrythecoder'
 archivesBaseName = 'quartz-mongodb'
 
 jar {

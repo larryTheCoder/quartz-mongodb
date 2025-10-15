@@ -63,13 +63,13 @@ jobs:
             Maven Usage:
               ```
               <dependency>
-                <groupId>io.github.avi-sanwal</groupId>
+                <groupId>io.github.larrythecoder</groupId>
                 <artifactId>quartz-mongodb</artifactId>
                 <version>${{ steps.nextSemver.outputs.nextStrict }}</version>
               </dependency>
               ```
             Gradle Usage:
-              `implementation("io.github.avi-sanwal:quartz-mongodb:${{ steps.nextSemver.outputs.nextStrict }}")`
+              `implementation("io.github.larrythecoder:quartz-mongodb:${{ steps.nextSemver.outputs.nextStrict }}")`
           generate_release_notes: true
           files: |
             build/libs/quartz-mongodb-${{ steps.nextSemver.outputs.nextStrict }}.jar
