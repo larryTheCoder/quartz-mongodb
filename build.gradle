@@ -137,11 +137,11 @@ publishing {
 
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/avi-sanwal/quartz-mongodb")
+            name = "Clojars"
+            url = uri("https://repo.clojars.org/")
             credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GH_USERNAME")
-                password = project.findProperty("gpr.key") ?: System.getenv("GH_TOKEN")
+                username = project.findProperty("clojars.user") ?: System.getenv("CLOJARS_USERNAME")
+                password = project.findProperty("clojars.password") ?: System.getenv("CLOJARS_PASSWORD")
             }
         }
     }
