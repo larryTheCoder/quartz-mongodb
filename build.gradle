@@ -54,7 +54,7 @@ dependencies {
     implementation("org.quartz-scheduler:quartz:2.5.0")
     implementation("org.mongodb:mongodb-driver-sync:5.5.1")
     implementation("commons-codec:commons-codec:1.18.0")
-    implementation("org.apache.commons:commons-lang3:3.17.0")
+    implementation("org.apache.commons:commons-lang3:3.19.0")
     implementation("org.apache.httpcomponents:httpcore:4.4.16")
     implementation("org.slf4j:slf4j-api:2.0.17")
 
