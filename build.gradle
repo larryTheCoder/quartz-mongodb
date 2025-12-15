@@ -64,7 +64,7 @@ dependencies {
     testImplementation("joda-time:joda-time:2.14.0")
     testImplementation("org.slf4j:slf4j-simple:2.0.17")
     testImplementation("org.codehaus.groovy:groovy-all:3.0.25")
-    testImplementation("org.spockframework:spock-core:2.3-groovy-4.0")
+    testImplementation("org.spockframework:spock-core:2.4-groovy-5.0")
     testRuntimeOnly("cglib:cglib-nodep:3.3.0")
     testRuntimeOnly("org.objenesis:objenesis:3.4")
 }
