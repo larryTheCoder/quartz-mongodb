@@ -61,7 +61,7 @@ dependencies {
     compileOnly("org.clojure:clojure:1.12.5")
 
     testImplementation("org.clojure:clojure:1.12.5")
-    testImplementation("joda-time:joda-time:2.14.2")
+    testImplementation("joda-time:joda-time:2.14.3")
     testImplementation("org.slf4j:slf4j-simple:2.0.18")
     testImplementation("org.codehaus.groovy:groovy-all:3.0.25")
     testImplementation("org.spockframework:spock-core:2.4-groovy-5.0")
